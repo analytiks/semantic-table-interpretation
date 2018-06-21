@@ -22,23 +22,29 @@ class Table(TableEntity):
     def get_NE_cols(self):
         cols = []
         for column in self.columns:
-            if(column.isNE()):
+            if(column.is_NE()):
                 cols.append(column)
-        return cols
+        sub_table = Table()
+        sub_table.columns = cols
+        return sub_table
 
     def get_numeric_cols(self):
         cols = []
         for column in self.columns:
             if(column.is_numeric()):
                 cols.append(column)
-        return cols
+        sub_table = Table()
+        sub_table.columns = cols
+        return sub_table
 
     def get_date_cols(self):
         cols = []
         for column in self.columns:
             if(column.is_date()):
                 cols.append(column)
-        return cols
+        sub_table = Table()
+        sub_table.columns = cols
+        return sub_table
 
     def parse_csv(self, file_path):
         temp_df = pd.read_csv(file_path)
@@ -49,7 +55,6 @@ class Table(TableEntity):
             for value in values:
                 cells.append(Cell(value[0]))
             self.columns.append(Column(header, cells))
-
 
 
 class Column(TableEntity):
@@ -69,7 +74,7 @@ class Column(TableEntity):
                 if(cell.is_NE()):
                     NE_count += 1
             ne_percentage = float(NE_count)/float(len(self.cells))
-            if(ne_percentagec > 0.8):
+            if(ne_percentage > 0.8):
                 self.NE_col = True
             else:
                 self.NE_col = False
@@ -82,8 +87,6 @@ class Column(TableEntity):
                 if(cell.is_numeric()):
                     numeric_count += 1
             numeric_percentage = float(numeric_count)/len(self.cells)
-            print numeric_percentage
-
             if(numeric_percentage > 0.8):
                 self.numeric_col = True
             else:
@@ -110,9 +113,9 @@ class Cell(TableEntity):
         self.value = value
 
     def is_NE(self):
-        if(self.isDate):
+        if(self.is_date()):
             return False
-        elif(self, isNumeric):
+        elif(self.is_numeric()):
             return False
         else:
             return True
@@ -130,8 +133,13 @@ class Cell(TableEntity):
             return True
         except ValueError:
             return False
+        except TypeError:
+            return False
 
 
 if __name__ == "__main__":
     test_table = Table()
     test_table.parse_csv('sample.csv')
+    ne_table = test_table.get_numeric_cols()
+    for col in ne_table.columns:
+        print col.header
