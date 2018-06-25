@@ -9,7 +9,7 @@ class TableEntity(object):
 
     def __init__(self):
         self._predicted_labels = []
-        self.true_label = None 
+        self.true_label = None
     
     @property
     def predicted_labels(self):
@@ -39,8 +39,10 @@ class TableEntity(object):
 class Table(TableEntity):
 
     def __init__(self):
+        super(Table, self).__init__()
         self.columns = []
         self.rows = []
+        self.id = id
 
     def get_NE_cols(self):
         col_indices = []
@@ -106,6 +108,18 @@ class Table(TableEntity):
         return sub_table
 
     def visualize(self):
+        predicted_label_html = ""
+        for label in self.predicted_labels:
+            predicted_label_html += "<li>" + label[0] + "</li>"
+        predicted_label_html = "<ul>{}</ul>".format(predicted_label_html)
+        table_html = "<div class='card'>\
+                        <div class='card-body'>\
+                        <h5 class='card-title'>Table Element</h5>\
+                        <h6 class='card-subtitle mb-2 text-muted'>True Concept</h6>\
+                        <ul><li>{}</li></ul>\
+                        <h6 class='card-subtitle mb-2 text-muted'>True Concept</h6>\
+                        {}</div>\
+                    </div>".format(self.true_label, predicted_label_html)
         table_content = "<tr>"
         for col in self.columns:
             th_title = "title='True Concept:\n{} \
@@ -128,10 +142,16 @@ class Table(TableEntity):
                 <title>Table visualizer</title></head>\
                 <body>\
                 <div class='container'>\
-                <div class='row' style='padding-top:60px'>\
-                <table class='table'>{}</table>\
-                </div></div></body>\
-                </html>".format(table_content)
+                    <div class='row' style='padding-top:60px'>\
+                        <div class='col'>{}</div></div>\
+                    <div class='row' style='padding-top:60px'>\
+                        <div class='col'>\
+                            <table class='table'>{}</table>\
+                        </div>\
+                    </div>\
+                </div>\
+                </body>\
+                </html>".format(table_html,table_content)
 
         with open("output.html", 'wb') as f:
             f.write(html)
