@@ -9,9 +9,7 @@ class TableEntity(object):
 
     def __init__(self):
         self.predicted_labels = []
-        self.true_label = None
-    
-    # @property
+        self.true_l    # @property
     # def predicted_labels(self):
     #     return self.predicted_labels
 
@@ -20,7 +18,9 @@ class TableEntity(object):
     #     if(isinstance(new_labels,list)):
     #         self.predicted_labels = new_labels
     #     else:
-    #         raise Exception("Invalid value")
+    #         raise Exception("Invalid value")abel = None
+    
+
 
     def evaluate_mapping(self):
         """Check if the predicted mapping is correct.
