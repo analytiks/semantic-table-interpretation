@@ -147,6 +147,7 @@ class Column(TableEntity):
         self.numeric_col = None
         self.date_col = None
         self.NE_col = None
+        self.is_subject_column = False
 
     def is_NE(self):
         if(self.NE_col is None):
