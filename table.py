@@ -9,7 +9,9 @@ class TableEntity(object):
 
     def __init__(self):
         self.predicted_labels = []
-        self.true_l    # @property
+        self.true_l    
+    
+    # @property
     # def predicted_labels(self):
     #     return self.predicted_labels
 
