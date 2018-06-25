@@ -9,7 +9,7 @@ class TableEntity(object):
 
     def __init__(self):
         self.predicted_labels = []
-        self.true_l    
+        self.true_label = None 
     
     # @property
     # def predicted_labels(self):
@@ -20,7 +20,7 @@ class TableEntity(object):
     #     if(isinstance(new_labels,list)):
     #         self.predicted_labels = new_labels
     #     else:
-    #         raise Exception("Invalid value")abel = None
+    #         raise Exception("Invalid value")
     
 
 
