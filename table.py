@@ -112,7 +112,7 @@ class Table(TableEntity):
             th_title = "title='True Concept:{} \
                         &#xA;Predicted Concepts:".format(col.true_label)
             for label in col.predicted_labels:
-                th_title = th_title+label
+                th_title = "\n" + th_title+label[0]+"\n"
             th_title = th_title + "'"
             curr_header = "<th {}>{}</th>".format(th_title, col.header)
             table_content = table_content + curr_header
