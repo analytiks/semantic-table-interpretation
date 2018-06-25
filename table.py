@@ -1,6 +1,6 @@
-from dateutil.parser import parse
+from dateutil.parser import parse as date_parser
 import pandas as pd
-
+import copy
 
 class TableEntity(object):
     """Abstract class for all the table element classes(Table class, 
@@ -8,21 +8,23 @@ class TableEntity(object):
     """
 
     def __init__(self):
-        self.predicted_labels = []
-        self.true_l    
+        self._predicted_labels = []
+        self.true_label = None 
     
-    # @property
-    # def predicted_labels(self):
-    #     return self.predicted_labels
+    @property
+    def predicted_labels(self):
+        return self._predicted_labels
 
-    # @predicted_labels.setter
-    # def predicted_labels(self, new_labels):
-    #     if(isinstance(new_labels,list)):
-    #         self.predicted_labels = new_labels
-    #     else:
-    #         raise Exception("Invalid value")abel = None
+    @predicted_labels.setter
+    def predicted_labels(self, new_labels):
+        if(isinstance(new_labels,list)):
+            self._predicted_labels = new_labels
+        else:
+            raise Exception("Invalid value")
     
-
+    @predicted_labels.deleter
+    def predicted_labels(self):
+        del self._length
 
     def evaluate_mapping(self):
         """Check if the predicted mapping is correct.
@@ -106,8 +108,8 @@ class Table(TableEntity):
     def visualize(self):
         table_content = "<tr>"
         for col in self.columns:
-            th_title = "title='True Concept:{} \
-                        &#xA;Predicted Concepts:".format(col.true_label)
+            th_title = "title='True Concept:\n{} \
+                        \nPredicted Concepts:\n".format(col.true_label)
             for label in col.predicted_labels:
                 th_title = "\n" + th_title+label[0]+"\n"
             th_title = th_title + "'"
@@ -119,8 +121,11 @@ class Table(TableEntity):
             table_content = table_content + row.visualize()
         html = "<!DOCTYPE html><html>\
                 <head><meta charset=\"UTF-8\">\
-                <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>\
-               <title>Table visualizer</title></head>\
+                <link rel='stylesheet'\
+                 href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'\
+                 integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm'\
+                 crossorigin='anonymous'>\
+                <title>Table visualizer</title></head>\
                 <body>\
                 <div class='container'>\
                 <div class='row' style='padding-top:60px'>\
@@ -142,6 +147,7 @@ class Column(TableEntity):
         self.numeric_col = None
         self.date_col = None
         self.NE_col = None
+        self.is_subject_column = False
 
     def is_NE(self):
         if(self.NE_col is None):
@@ -183,10 +189,10 @@ class Column(TableEntity):
         return self.date_col
     
     def get_cardinality(self):
-        temp_values = []
+        temp_values = set()
         for cell in self.cells:
-            temp_values.append(cell.value)
-        return len(set(temp_values))
+            temp_values.add(cell.value)
+        return len(temp_values)
 
 
 class Row(TableEntity):
@@ -219,14 +225,14 @@ class Cell(TableEntity):
 
     def is_numeric(self):
         try:
-            float(self.value)
+            float(copy.copy(self.value))
             return True
         except ValueError:
             return False
 
     def is_date(self):
         try:
-            parse(self.value)
+            date_parser(copy.copy(self.value))
             return True
         except ValueError:
             return False
@@ -234,19 +240,19 @@ class Cell(TableEntity):
             return False
 
     def visualize(self):
-        html_actual = "<td title=\"Actual concept: {}".format(self.true_label)
-        html_predicted = "&#xA;Predicted concepts: "
-        html_value = "\">{}</td>".format(self.value)
+        html_head = "<td title='Actual concept:\n"\
+                    +"{}\nPredicted concepts:\n".format(self.true_label)
+        html_tail = "'>{}</td>".format(self.value)
         for label in self.predicted_labels:
-            html_predicted = html_predicted + label
-        html = html_actual+html_predicted+html_value
+            html_head = html_head + label[0] + "\n"
+        html = html_head + html_tail
         return html
 
 
 if __name__ == "__main__":
     test_table = Table()
     test_table.parse_csv('sample.csv')
-    ne_table = test_table
+    ne_table = test_table.get_NE_cols()
     for col in ne_table.columns:
         print col.header + ": ",
         print col.get_cardinality()
