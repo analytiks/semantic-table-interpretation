@@ -1,4 +1,6 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
+import cache
+import json
 
 '''
 Todo:
@@ -8,12 +10,22 @@ Todo:
 '''
 
 def execute_sparql_query(query):
+    #first try the cache
+    result = cache.get(query)
+    if result is not None:
+        return result
+
+    #if no result in cache
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    # sparql = SPARQLWrapper("http://35.196.96.177:8890/sparql")
     sparql.addDefaultGraph("http://dbpedia.org")
     sparql.setReturnFormat(JSON)
     sparql.setQuery(query)
+    result = sparql.query().convert()["results"]["bindings"]
 
-    return sparql.query().convert()["results"]["bindings"]
+    cache.put(query, result)
+
+    return result
 
 
 def get_class_of_instance(instance):
@@ -43,15 +55,16 @@ FROM <http://people.aifb.kit.edu/ath/#DBpedia_PageRank>
 '''
 def get_exact_label_match(value):
     query = """
-            SELECT DISTINCT ?uri ?label
+            SELECT DISTINCT ?uri ?label ?type
             WHERE {
                 ?uri rdfs:label ?label .
-                FILTER (?label='""" + value + """'@en)
+                ?uri rdf:type ?type .
+                FILTER (?label="%s"@en)
             }
-            """
+            """% value
     result = execute_sparql_query(query)
 
-    return result[0] if result else None
+    return result if result else None
 
 
 def get_included_labels(value):
