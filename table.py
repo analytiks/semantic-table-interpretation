@@ -8,7 +8,7 @@ class TableEntity(object):
     """
 
     def __init__(self):
-        self._predicted_labels = []
+        self.predicted_labels = []
         self.true_label = None 
     
     # @property
