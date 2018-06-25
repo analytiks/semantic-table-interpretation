@@ -189,10 +189,10 @@ class Column(TableEntity):
         return self.date_col
     
     def get_cardinality(self):
-        temp_values = []
+        temp_values = set()
         for cell in self.cells:
-            temp_values.append(cell.value)
-        return len(set(temp_values))
+            temp_values.add(cell.value)
+        return len(temp_values)
 
 
 class Row(TableEntity):
@@ -252,7 +252,7 @@ class Cell(TableEntity):
 if __name__ == "__main__":
     test_table = Table()
     test_table.parse_csv('sample.csv')
-    ne_table = test_table.get_date_cols()
+    ne_table = test_table.get_NE_cols()
     for col in ne_table.columns:
         print col.header + ": ",
         print col.get_cardinality()
