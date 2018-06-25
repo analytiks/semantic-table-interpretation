@@ -247,16 +247,14 @@ class Cell(TableEntity):
         try:
             float(copy.copy(self.value))
             return True
-        except ValueError:
+        except Exception:
             return False
 
     def is_date(self):
         try:
             date_parser(copy.copy(self.value))
             return True
-        except ValueError:
-            return False
-        except TypeError:
+        except Exception:
             return False
 
     def visualize(self):
