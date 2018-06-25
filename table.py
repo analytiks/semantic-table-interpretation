@@ -3,28 +3,50 @@ import pandas as pd
 
 
 class TableEntity(object):
+    """Abstract class for all the table element classes(Table class, 
+    Column class, Row class, Cell class)
+    DO NOT DIRECLY CHANGE PRIVATE VARIABLES - All the required methods are provided
+    """
 
     def __init__(self):
-        self.predicted_labels = []
-        self.true_label = None
+        self.__predicted_labels__ = []
+        self.__true_label__ = None
 
-    def add_label(self, label):
+    def add_predicted_label(self, label):
+        """Appends given label to predicted labels list.
+        Args:
+            label: label to be added
+        """
         self.predicted_labels.append(label)
 
-    def get_labels(self):
+    def get_predicted_labels(self):
         return self.predicted_labels
+    
+    def set_predicted_labels(self, labels):
+        if(isinstance(labels,list)):
+            self.__predicted_labels__ = labels
 
+
+    def evaluate_mapping(self):
+        """Check if the predicted mapping is correct.
+        Returns:
+            Boolean: True if mapping is corrrect. False otherwise
+        """
+        if(self.__true_label__==self.__predicted_labels__[0]):
+            return True
+        else:
+            return False
 
 class Table(TableEntity):
 
     def __init__(self):
-        self.columns = []
-        self.rows = []
+        self.__cols__ = []
+        self.__rows__ = []
 
     def get_NE_cols(self):
         col_indices = []
         i = 0
-        for column in self.columns:
+        for column in self.__cols__:
             if(column.is_NE()):
                 col_indices.append(i)
             i += 1
@@ -34,7 +56,7 @@ class Table(TableEntity):
     def get_numeric_cols(self):
         col_indices = []
         i = 0
-        for column in self.columns:
+        for column in self.__cols__:
             if(column.is_numeric()):
                 col_indices.append(i)
             i += 1
@@ -44,7 +66,7 @@ class Table(TableEntity):
     def get_date_cols(self):
         col_indices = []
         i = 0
-        for column in self.columns:
+        for column in self.__cols__:
             if(column.is_date()):
                 col_indices.append(i)
             i += 1
@@ -59,13 +81,13 @@ class Table(TableEntity):
             cells = []
             for value in values:
                 cells.append(Cell(value[0]))
-            self.columns.append(Column(header, cells))
+            self.__cols__.append(Column(header, cells))
         row_list = temp_df.values.tolist()
         for row in row_list:
             cells = []
             for value in row:
                 cells.append(Cell(value))
-            self.rows.append(Row(cells))
+            self.__rows__.append(Row(cells))
 
     def get_subtable(self, indices=[], axis="col"):
         new_cols = []
@@ -73,20 +95,20 @@ class Table(TableEntity):
         indices.sort()
         if(axis == "col"):
             for i in indices:
-                new_cols.append(self.columns[i])
-            for row in self.rows:
+                new_cols.append(self.__cols__[i])
+            for row in self.__rows__:
                 row_cells = []
                 for j in indices:
                     row_cells.append(row.cells[j])
                 new_rows.append(Row(row_cells))
         sub_table = Table()
-        sub_table.columns = new_cols
-        sub_table.rows = new_rows
+        sub_table.__cols__ = new_cols
+        sub_table.__rows__ = new_rows
         return sub_table
 
     def visualize(self):
         table_content = "<tr>"
-        for col in self.columns:
+        for col in self.__cols__:
             th_title = "title='True Concept:{} \
                         &#xA;Predicted Concepts:".format(col.true_label)
             for label in col.predicted_labels:
@@ -96,7 +118,7 @@ class Table(TableEntity):
             table_content = table_content + curr_header
         table_content = table_content + "</tr>"
 
-        for row in self.rows:
+        for row in self.__rows__:
             table_content = table_content + row.visualize()
         html = "<!DOCTYPE html><html>\
                 <head><meta charset=\"UTF-8\">\
@@ -165,6 +187,12 @@ class Column(TableEntity):
             else:
                 self.date_col = False
         return self.date_col
+    
+    def get_cardinality(self):
+        temp_values = []
+        for cell in self.cells:
+            temp_values.append(cell.value)
+        return len(set(temp_values))
 
 
 class Row(TableEntity):
@@ -224,9 +252,8 @@ class Cell(TableEntity):
 if __name__ == "__main__":
     test_table = Table()
     test_table.parse_csv('sample.csv')
-    ne_table = test_table.get_numeric_cols()
-    for row in ne_table.rows:
-        for cell in row.cells:
-            print cell.value,
-        print ""
+    ne_table = test_table
+    for col in ne_table.__cols__:
+        print col.header + ": ",
+        print col.get_cardinality()
     test_table.visualize()

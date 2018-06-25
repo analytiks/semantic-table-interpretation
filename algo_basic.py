@@ -38,7 +38,7 @@ tb = Table()
 tb.parse_csv(input_path)
 
 ne = tb.get_NE_cols()
-for column in ne.columns:
+for column in ne.__cols__:
     candidate_classes = dict()
 
     logger.info("Processing header: %s" % column.header)
