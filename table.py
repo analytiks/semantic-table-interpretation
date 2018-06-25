@@ -1,6 +1,6 @@
-from dateutil.parser import parse
+from dateutil.parser import parse as date_parser
 import pandas as pd
-
+import copy
 
 class TableEntity(object):
     """Abstract class for all the table element classes(Table class, 
@@ -224,14 +224,14 @@ class Cell(TableEntity):
 
     def is_numeric(self):
         try:
-            float(copy(self.value))
+            float(copy.copy(self.value))
             return True
         except ValueError:
             return False
 
     def is_date(self):
         try:
-            parse(self.value)
+            date_parser(copy.copy(self.value))
             return True
         except ValueError:
             return False
@@ -251,7 +251,7 @@ class Cell(TableEntity):
 if __name__ == "__main__":
     test_table = Table()
     test_table.parse_csv('sample.csv')
-    ne_table = test_table
+    ne_table = test_table.get_date_cols()
     for col in ne_table.columns:
         print col.header + ": ",
         print col.get_cardinality()
