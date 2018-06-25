@@ -107,12 +107,20 @@ class Table(TableEntity):
         return sub_table
 
     def visualize(self):
+<<<<<<< HEAD
         table_content = "<tr>"
         for col in self.__cols__:
             th_title = "title='True Concept:{} \
                         &#xA;Predicted Concepts:".format(col.true_label)
+=======
+        html_head = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>title</title></head><body><table><tr>"
+        html_tail = "</table></body></html>"
+
+        for col in self.columns:
+            th_title = "title='True Concept:{} &#xA;Predicted Concepts:".format(col.true_label)
+>>>>>>> parent of 8f498ea... added table class
             for label in col.predicted_labels:
-                th_title = "\n" + th_title+label[0]+"\n"
+                th_title = th_title+label
             th_title = th_title + "'"
             curr_header = "<th {}>{}</th>".format(th_title, col.header)
             table_content = table_content + curr_header
