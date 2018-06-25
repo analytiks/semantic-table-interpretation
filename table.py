@@ -8,19 +8,19 @@ class TableEntity(object):
     """
 
     def __init__(self):
-        self.predicted_labels = []
+        self._predicted_labels = []
         self.true_label = None 
     
-    # @property
-    # def predicted_labels(self):
-    #     return self.predicted_labels
+    @property
+    def predicted_labels(self):
+        return self._predicted_labels
 
-    # @predicted_labels.setter
-    # def predicted_labels(self, new_labels):
-    #     if(isinstance(new_labels,list)):
-    #         self.predicted_labels = new_labels
-    #     else:
-    #         raise Exception("Invalid value")
+    @predicted_labels.setter
+    def predicted_labels(self, new_labels):
+        if(isinstance(new_labels,list)):
+            self._predicted_labels = new_labels
+        else:
+            raise Exception("Invalid value")
     
 
 
