@@ -21,6 +21,10 @@ class TableEntity(object):
             self._predicted_labels = new_labels
         else:
             raise Exception("Invalid value")
+    
+    @predicted_labels.deleter
+    def predicted_labels(self):
+        del self._length
 
     def evaluate_mapping(self):
         """Check if the predicted mapping is correct.
@@ -117,8 +121,11 @@ class Table(TableEntity):
             table_content = table_content + row.visualize()
         html = "<!DOCTYPE html><html>\
                 <head><meta charset=\"UTF-8\">\
-                <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>\
-               <title>Table visualizer</title></head>\
+                <link rel='stylesheet'\
+                 href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'\
+                 integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm'\
+                 crossorigin='anonymous'>\
+                <title>Table visualizer</title></head>\
                 <body>\
                 <div class='container'>\
                 <div class='row' style='padding-top:60px'>\
@@ -217,7 +224,7 @@ class Cell(TableEntity):
 
     def is_numeric(self):
         try:
-            float(self.value)
+            float(copy(self.value))
             return True
         except ValueError:
             return False
@@ -232,7 +239,8 @@ class Cell(TableEntity):
             return False
 
     def visualize(self):
-        html_head = "<td title='Actual concept:\n{}\nPredicted concepts:\n".format(self.true_label)
+        html_head = "<td title='Actual concept:\n"\
+                    +"{}\nPredicted concepts:\n".format(self.true_label)
         html_tail = "'>{}</td>".format(self.value)
         for label in self.predicted_labels:
             html_head = html_head + label[0] + "\n"
