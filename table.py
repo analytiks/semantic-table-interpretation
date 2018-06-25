@@ -115,9 +115,9 @@ class Table(TableEntity):
         table_html = "<div class='card'>\
                         <div class='card-body'>\
                         <h5 class='card-title'>Table Element</h5>\
-                        <h6 class='card-subtitle mb-2 text-muted'>True Concept</h6>\
+                        <h6 class='card-subtitle mb-2 text-muted'>True Concept:</h6>\
                         <ul><li>{}</li></ul>\
-                        <h6 class='card-subtitle mb-2 text-muted'>Predicted Concept</h6>\
+                        <h6 class='card-subtitle mb-2 text-muted'>Predicted Concepts:</h6>\
                         {}</div>\
                     </div>".format(self.true_label, predicted_label_html)
         table_content = "<tr>"
