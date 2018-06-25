@@ -64,23 +64,25 @@ def get_exact_label_match(value):
                 ?uri rdf:type ?type .
                 FILTER (?label="%s"@en)
             }
-            """% value
+            """ % value
     result = execute_sparql_query(query)
 
     return result if result else None
 
 
-def get_included_labels(value):
+def lookup_regex(value):
     query = """
-            SELECT ?uri ?label ?type
+            SELECT DISTINCT ?uri ?label ?type
             WHERE {
                 ?uri rdfs:label ?label .
-                ?uri <http://dbpedia.org/ontology/type> ?type .
-                FILTER regex(str(?label), '""" + value + """') .
-                FILTER (lang(?label) = "en")
+                ?uri rdf:type ?type .
+                FILTER (regex(?label, '%s','i')) .
+                FILTER (lang(?label) = 'en')
             }
+            order by strlen(str(?label))
             limit 10
-            """
+
+            """ % value
 
     return execute_sparql_query(query)
 
