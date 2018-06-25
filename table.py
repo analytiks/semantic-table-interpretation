@@ -117,7 +117,7 @@ class Table(TableEntity):
                         <h5 class='card-title'>Table Element</h5>\
                         <h6 class='card-subtitle mb-2 text-muted'>True Concept</h6>\
                         <ul><li>{}</li></ul>\
-                        <h6 class='card-subtitle mb-2 text-muted'>True Concept</h6>\
+                        <h6 class='card-subtitle mb-2 text-muted'>Predicted Concept</h6>\
                         {}</div>\
                     </div>".format(self.true_label, predicted_label_html)
         table_content = "<tr>"
@@ -276,4 +276,4 @@ if __name__ == "__main__":
     for col in ne_table.columns:
         print col.header + ": ",
         print col.get_cardinality()
-    test_table.visualize()
+    ne_table.visualize()
