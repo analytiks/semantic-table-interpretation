@@ -50,6 +50,7 @@ def algo(table):
                 if concept is not None and len(concept) > 0:
                     # logger.info("--candidate found!")
                     process_candidates(candidate_classes, concept)
+                    cell.predicted_labels = concept
                     break      
 
         column.predicted_labels = sorted(candidate_classes.items(), key=lambda (k, v): v, reverse=True)[0:5]
