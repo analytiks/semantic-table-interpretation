@@ -8,7 +8,7 @@ class TableEntity(object):
     """
 
     def __init__(self):
-        self.predicted_labels = []
+        self._predicted_labels = []
         self.true_label = None 
     
     # @property
@@ -106,8 +106,8 @@ class Table(TableEntity):
     def visualize(self):
         table_content = "<tr>"
         for col in self.columns:
-            th_title = "title='True Concept:{} \
-                        &#xA;Predicted Concepts:".format(col.true_label)
+            th_title = "title='True Concept:\n{} \
+                        &#xA;Predicted Concepts:\n".format(col.true_label)
             for label in col.predicted_labels:
                 th_title = "\n" + th_title+label[0]+"\n"
             th_title = th_title + "'"
@@ -234,8 +234,8 @@ class Cell(TableEntity):
             return False
 
     def visualize(self):
-        html_actual = "<td title=\"Actual concept: {}".format(self.true_label)
-        html_predicted = "&#xA;Predicted concepts: "
+        html_actual = "<td title=\"Actual concept:\n{}".format(self.true_label)
+        html_predicted = "&#xA;Predicted concepts:\n"
         html_value = "\">{}</td>".format(self.value)
         for label in self.predicted_labels:
             html_predicted = html_predicted + label
