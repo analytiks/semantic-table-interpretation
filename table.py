@@ -48,6 +48,18 @@ class Table(TableEntity):
         self.__cols__ = []
         self.__rows__ = []
 
+    def set_columns(self, cols):
+        self.__cols__ = cols
+
+    def set_columns(self, rows):
+        self.__rows__ = rows
+
+    def get_columns(self):
+        return self.__cols__
+
+    def get_rows(self):
+        return self.__rows__
+
     def get_NE_cols(self):
         col_indices = []
         i = 0
@@ -104,7 +116,7 @@ class Table(TableEntity):
             for row in self.__rows__:
                 row_cells = []
                 for j in indices:
-                    row_cells.append(row.cells[j])
+                    row_cells.append(row.get_cells()[j])
                 new_rows.append(Row(row_cells))
         sub_table = Table()
         sub_table.__cols__ = new_cols
@@ -119,7 +131,7 @@ class Table(TableEntity):
             for label in col.__predicted_labels__:
                 th_title = "\n" + th_title+label[0]+"\n"
             th_title = th_title + "'"
-            curr_header = "<th {}>{}</th>".format(th_title, col.header)
+            curr_header = "<th {}>{}</th>".format(th_title, col.get_header())
             table_content = table_content + curr_header
         table_content = table_content + "</tr>"
 
@@ -143,24 +155,33 @@ class Table(TableEntity):
             f.write(html)
 
 
+
 class Column(TableEntity):
 
     def __init__(self, header, cells):
         super(Column, self).__init__()
-        self.header = header
-        self.cells = cells
-        self.labels = []
+        self.__header__ = header
+        self.__cells__ = cells
         self.numeric_col = None
         self.date_col = None
         self.NE_col = None
+    
+    def get_header(self):
+        return self.__header__
+
+    def set_cells(self, cells):
+        self.__cells__ = cells
+    
+    def get_cells(self):
+        return self.__cells__
 
     def is_NE(self):
         if(self.NE_col is None):
             NE_count = 0
-            for cell in self.cells:
+            for cell in self.__cells__:
                 if(cell.is_NE()):
                     NE_count += 1
-            ne_percentage = float(NE_count)/float(len(self.cells))
+            ne_percentage = float(NE_count)/float(len(self.__cells__))
             if(ne_percentage > 0.8):
                 self.NE_col = True
             else:
@@ -170,10 +191,10 @@ class Column(TableEntity):
     def is_numeric(self):
         if(self.numeric_col is None):
             numeric_count = 0
-            for cell in self.cells:
+            for cell in self.__cells__:
                 if(cell.is_numeric()):
                     numeric_count += 1
-            numeric_percentage = float(numeric_count)/len(self.cells)
+            numeric_percentage = float(numeric_count)/len(self.__cells__)
             if(numeric_percentage > 0.8):
                 self.numeric_col = True
             else:
@@ -183,10 +204,10 @@ class Column(TableEntity):
     def is_date(self):
         if(self.date_col is None):
             date_count = 0
-            for cell in self.cells:
+            for cell in self.__cells__:
                 if(cell.is_date()):
                     date_count += 1
-            date_percentage = float(date_count)/float(len(self.cells))
+            date_percentage = float(date_count)/float(len(self.__cells__))
             if(date_percentage > 0.8):
                 self.date_col = True
             else:
@@ -195,8 +216,8 @@ class Column(TableEntity):
     
     def get_cardinality(self):
         temp_values = []
-        for cell in self.cells:
-            temp_values.append(cell.value)
+        for cell in self.__cells__:
+            temp_values.append(cell.get_value())
         return len(set(temp_values))
 
 
@@ -204,11 +225,17 @@ class Row(TableEntity):
 
     def __init__(self, cells):
         super(Row, self).__init__()
-        self.cells = cells
+        self.__cells__ = cells
+    
+    def set_cells(self, cells):
+        self.__cells__ = cells
+    
+    def get_cells(self):
+        return self.__cells__
 
     def visualize(self):
         html = "<tr>"
-        for cell in self.cells:
+        for cell in self.__cells__:
             html = html + cell.visualize()
         html = html + "</tr>"
         return html
@@ -218,7 +245,13 @@ class Cell(TableEntity):
 
     def __init__(self, value):
         super(Cell, self).__init__()
-        self.value = value
+        self.__value__ = value
+    
+    def set_value(self, value):
+        self.__value__ = value
+    
+    def get_value(self):
+        return self.__value__
 
     def is_NE(self):
         if(self.is_date()):
@@ -230,14 +263,14 @@ class Cell(TableEntity):
 
     def is_numeric(self):
         try:
-            float(self.value)
+            float(self.__value__)
             return True
         except ValueError:
             return False
 
     def is_date(self):
         try:
-            parse(self.value)
+            parse(self.__value__)
             return True
         except ValueError:
             return False
@@ -247,7 +280,7 @@ class Cell(TableEntity):
     def visualize(self):
         html_actual = "<td title=\"Actual concept: {}".format(self.get_true_label())
         html_predicted = "&#xA;Predicted concepts: "
-        html_value = "\">{}</td>".format(self.value)
+        html_value = "\">{}</td>".format(self.__value__)
         for label in self.__predicted_labels__:
             html_predicted = html_predicted + label
         html = html_actual+html_predicted+html_value
@@ -259,6 +292,6 @@ if __name__ == "__main__":
     test_table.parse_csv('sample.csv')
     ne_table = test_table
     for col in ne_table.__cols__:
-        print col.header + ": ",
+        print col.get_header() + ": ",
         print col.get_cardinality()
     test_table.visualize()
