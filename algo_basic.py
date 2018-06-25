@@ -52,33 +52,16 @@ for column in ne.columns:
         value = " ".join(cell.value.split()).strip()
         value_perms =  get_common_cases(value)
 
-        logger.info("Processing cell: %s" % value)
+        # logger.info("Processing cell: %s" % value)
         for perm in value_perms:
             concept = get_exact_label_match(perm)
             if concept is not None and len(concept) > 0:
-<<<<<<< HEAD
-                process_candidates(candidate_classes, concept, True)
-                break
-
-        for cell in column.cells:
-            value = " ".join(cell.value.split()).strip()
-            value_perms =  get_common_cases(value)
-
-            # logger.info("Processing cell: %s" % value)
-            for perm in value_perms:
-                concept = get_exact_label_match(perm)
-                if concept is not None and len(concept) > 0:
-                    # logger.info("--candidate found!")
-                    process_candidates(candidate_classes, concept)
-                    cell.predicted_labels = concept
-                    break      
+                # logger.info("--candidate found!")
+                process_candidates(candidate_classes, concept)
+                cell.predicted_labels = concept
+                break      
 
         column.predicted_labels = sorted(candidate_classes.items(), key=lambda (k, v): v, reverse=True)[0:5]
-=======
-                logger.info("--candidate found!")
-                process_candidates(candidate_classes, concept)
-                break           
->>>>>>> parent of 8f498ea... added table class
     
     print sorted(candidate_classes.items(), key=lambda (k, v): v, reverse=True)[0:5]
     
