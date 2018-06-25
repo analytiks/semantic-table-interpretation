@@ -10,13 +10,6 @@ class TableEntity(object):
     def __init__(self):
         self.predicted_labels = []
         self.true_label = None
-
-    def add_predicted_label(self, label):
-        """Appends given label to predicted labels list.
-        Args:
-            label: label to be added
-        """
-        self.predicted_labels.append(label)
     
     # @property
     # def predicted_labels(self):
@@ -124,13 +117,8 @@ class Table(TableEntity):
             table_content = table_content + row.visualize()
         html = "<!DOCTYPE html><html>\
                 <head><meta charset=\"UTF-8\">\
-                <link rel='stylesheet'\
-                 href='https://maxcdn.bootstrapcdn.com/bootstrap/\4.0.0/css/\
-                 bootstrap.min.css'\
-                 integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263Xm\
-                 FcJlSAwiGgFAW/dAiS6JXm'\
-                 crossorigin='anonymous'>\
-                <title>Table visualizer</title></head>\
+                <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>\
+               <title>Table visualizer</title></head>\
                 <body>\
                 <div class='container'>\
                 <div class='row' style='padding-top:60px'>\
