@@ -41,7 +41,7 @@ def evaluate_t2d_complete(data_dir, class_ann, column_ann_dir, algorithm):
             tb.parse_csv(join(data_dir, table_file))
             tb = algorithm(tb)
 
-            print tb.columns[0].predicted_labels
+            print tb.columns[0].cells[0].predicted_labels
             tb.visualize()
         except Exception as e:
             logger.error("Error parsing table: %s" % table_file)
