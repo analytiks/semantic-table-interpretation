@@ -85,24 +85,35 @@ class Table(TableEntity):
         return sub_table
 
     def visualize(self):
-        html_head = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>title</title></head><body><table><tr>"
-        html_tail = "</table></body></html>"
-
+        table_content = "<tr>"
         for col in self.columns:
-            th_title = "title='True Concept:{} &#xA;Predicted Concepts:".format(col.true_label)
+            th_title = "title='True Concept:{} \
+                        &#xA;Predicted Concepts:".format(col.true_label)
             for label in col.predicted_labels:
                 th_title = th_title+label
             th_title = th_title + "'"
             curr_header = "<th {}>{}</th>".format(th_title, col.header)
-            html_head = html_head + curr_header
-
-        html_head = html_head + "</tr>"
+            table_content = table_content + curr_header
+        table_content = table_content + "</tr>"
 
         for row in self.rows:
-            html_head = html_head + row.visualize()
-        html = html_head+html_tail
+            table_content = table_content + row.visualize()
+        html = "<!DOCTYPE html><html>\
+                <head><meta charset=\"UTF-8\">\
+                <link rel='stylesheet'\
+                 href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'\
+                 integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm'\
+                 crossorigin='anonymous'>\
+                <title>Table visualizer</title></head>\
+                <body>\
+                <div class='container'>\
+                <div class='row' style='padding-top:60px'>\
+                <table class='table'>{}</table>\
+                </div></div></body>\
+                </html>".format(table_content)
+
         with open("output.html", 'wb') as f:
-            f.write(html)        
+            f.write(html)
 
 
 class Column(TableEntity):
@@ -156,10 +167,10 @@ class Column(TableEntity):
         return self.date_col
 
 
-class Row():
+class Row(TableEntity):
 
     def __init__(self, cells):
-        # super(Row, self).__init__()
+        super(Row, self).__init__()
         self.cells = cells
 
     def visualize(self):
@@ -213,9 +224,9 @@ class Cell(TableEntity):
 if __name__ == "__main__":
     test_table = Table()
     test_table.parse_csv('sample.csv')
-    ne_table = test_table.get_NE_cols()
+    ne_table = test_table.get_numeric_cols()
     for row in ne_table.rows:
         for cell in row.cells:
             print cell.value,
         print ""
-    ne_table.visualize()
+    test_table.visualize()
