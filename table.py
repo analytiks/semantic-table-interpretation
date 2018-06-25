@@ -25,7 +25,12 @@ class TableEntity(object):
     def set_predicted_labels(self, labels):
         if(isinstance(labels,list)):
             self.__predicted_labels__ = labels
+    
+    def get_true_label(self):
+        return self.__true_label__
 
+    def set_true_label(self, label):
+        self.__predicted_labels__ = label
 
     def evaluate_mapping(self):
         """Check if the predicted mapping is correct.
@@ -110,8 +115,8 @@ class Table(TableEntity):
         table_content = "<tr>"
         for col in self.__cols__:
             th_title = "title='True Concept:{} \
-                        &#xA;Predicted Concepts:".format(col.true_label)
-            for label in col.predicted_labels:
+                        &#xA;Predicted Concepts:".format(col.get_true_label())
+            for label in col.__predicted_labels__:
                 th_title = "\n" + th_title+label[0]+"\n"
             th_title = th_title + "'"
             curr_header = "<th {}>{}</th>".format(th_title, col.header)
@@ -240,10 +245,10 @@ class Cell(TableEntity):
             return False
 
     def visualize(self):
-        html_actual = "<td title=\"Actual concept: {}".format(self.true_label)
+        html_actual = "<td title=\"Actual concept: {}".format(self.get_true_label())
         html_predicted = "&#xA;Predicted concepts: "
         html_value = "\">{}</td>".format(self.value)
-        for label in self.predicted_labels:
+        for label in self.__predicted_labels__:
             html_predicted = html_predicted + label
         html = html_actual+html_predicted+html_value
         return html
