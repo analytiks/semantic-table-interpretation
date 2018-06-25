@@ -1,6 +1,9 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import cache
 import json
+import nltk
+from nltk.corpus import stopwords
+
 
 '''
 Todo:
@@ -80,3 +83,16 @@ def get_included_labels(value):
             """
 
     return execute_sparql_query(query)
+
+
+def lookup_without_stopwords(value):
+
+    results = {}
+
+    word_list = value.split(" ")
+    filtered_words = [word for word in word_list if word not in stopwords.words('english')]
+    for (i, word) in enumerate(filtered_words):
+        result = get_exact_label_match(word)
+        results[word] = result
+
+    return results
