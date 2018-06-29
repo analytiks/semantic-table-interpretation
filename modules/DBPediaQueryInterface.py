@@ -110,3 +110,14 @@ def get_all_properties(class_uri):
     result = execute_sparql_query(query)
 
     return result
+
+def get_relationship(resource_uri_1, resource_uri_2):
+    query = """
+        SELECT DISTINCT ?property 
+        WHERE {
+            <%s> ?property <%s> . 
+        }
+        """% (resource_uri_1, resource_uri_2)
+    result = execute_sparql_query(query)
+
+    return result
