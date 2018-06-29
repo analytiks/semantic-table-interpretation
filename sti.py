@@ -5,5 +5,5 @@ import modules.ColumnAnotator as clmannotator
 
 # print dbpedia.lookup_without_stopwords("USA and China")
 # print dbpedia.lookup_regex('China')
-print "Regex match for China"
-print dbpedia.lookup_regex('China')
+# print dbpedia.lookup_regex('China')
+print dbpedia.get_all_properties("http://dbpedia.org/ontology/Person")

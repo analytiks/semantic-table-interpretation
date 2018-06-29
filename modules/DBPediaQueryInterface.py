@@ -28,7 +28,7 @@ def execute_sparql_query(query):
 
     cache.put(query, result)
 
-    return result
+    return result if result else None
 
 
 def get_class_of_instance(instance):
@@ -42,7 +42,9 @@ def get_class_of_instance(instance):
                 }
             }
             """
-    return execute_sparql_query(query)
+    result = execute_sparql_query(query)
+
+    return result
 
 '''
 PREFIX vrank:<http://purl.org/voc/vrank#>           
@@ -67,7 +69,7 @@ def get_exact_label_match(value):
             """ % value
     result = execute_sparql_query(query)
 
-    return result if result else None
+    return result
 
 
 def lookup_regex(value):
@@ -81,16 +83,14 @@ def lookup_regex(value):
             }
             order by strlen(str(?label))
             limit 10
-
             """ % value
+    result = execute_sparql_query(query)
 
-    return execute_sparql_query(query)
+    return result
 
 
 def lookup_without_stopwords(value):
-
     results = {}
-
     word_list = value.split(" ")
     filtered_words = [word for word in word_list if word not in stopwords.words('english')]
     for (i, word) in enumerate(filtered_words):
@@ -98,3 +98,15 @@ def lookup_without_stopwords(value):
         results[word] = result
 
     return results
+
+def get_all_properties(class_uri):
+    query = """
+            SELECT DISTINCT ?property 
+            WHERE {
+                ?instance a <%s> . 
+                ?instance ?property ?obj . 
+            }
+            """ % class_uri
+    result = execute_sparql_query(query)
+
+    return result
