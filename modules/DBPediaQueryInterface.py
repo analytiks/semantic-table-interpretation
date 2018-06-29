@@ -104,7 +104,7 @@ def get_all_properties(class_uri):
             SELECT DISTINCT ?property 
             WHERE {
                 ?instance a <%s> . 
-                ?instance ?property ?obj . 
+                ?instance ?property ?object . 
             }
             """ % class_uri
     result = execute_sparql_query(query)
@@ -118,6 +118,18 @@ def get_relationship(resource_uri_1, resource_uri_2):
             <%s> ?property <%s> . 
         }
         """% (resource_uri_1, resource_uri_2)
+    result = execute_sparql_query(query)
+
+    return result
+
+def get_relationship_and_class(property_uri, class_uri):
+    query = """
+            select distinct ?class ?property where {
+                ?instance ?property <%s> .
+                ?property <http://www.w3.org/2000/01/rdf-schema#domain> ?class
+                FILTER(?instance = <%s>)
+            }
+            """% (property_uri, class_uri)
     result = execute_sparql_query(query)
 
     return result
