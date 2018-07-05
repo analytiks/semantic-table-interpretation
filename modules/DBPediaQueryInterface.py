@@ -122,14 +122,34 @@ def get_relationship(resource_uri_1, resource_uri_2):
 
     return result
 
-def get_relationship_and_class(property_uri, class_uri):
+def get_relationship_and_class(property_instance_uri, class_instance_uri):
     query = """
             select distinct ?class ?property where {
                 ?instance ?property <%s> .
                 ?property <http://www.w3.org/2000/01/rdf-schema#domain> ?class
                 FILTER(?instance = <%s>)
             }
-            """% (property_uri, class_uri)
+            """% (property_instance_uri, class_instance_uri)
+    result = execute_sparql_query(query)
+
+    return result
+
+def get_relationship_and_sub_classes(property_instance_uri, class_instance_uri):
+    query = """
+            select distinct ?subclass ?class ?property where {
+            ?instance ?property <%s> .
+            ?property <http://www.w3.org/2000/01/rdf-schema#domain> ?class .
+            ?subclass <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?class.
+            {
+                        select distinct ?class ?property where {
+                            ?instance ?property <%s> .
+                            ?property <http://www.w3.org/2000/01/rdf-schema#domain> ?class
+                            FILTER(?instance = <%s>)
+                        }
+            }
+            FILTER(?instance = <%s>)
+            }
+            """% (property_instance_uri, property_instance_uri, class_instance_uri, class_instance_uri)
     result = execute_sparql_query(query)
 
     return result
