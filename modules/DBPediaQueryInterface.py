@@ -153,3 +153,83 @@ def get_relationship_and_sub_classes(property_instance_uri, class_instance_uri):
     result = execute_sparql_query(query)
 
     return result
+
+def get_all_properties_by_class(class_uri):
+    query = """
+            select distinct ?property where{
+            {
+                ?property rdfs:domain ?class . 
+                <%s> rdfs:subClassOf+ ?class.
+                } UNION {
+                ?property rdfs:domain <%s>.
+                }
+            }
+            """% (class_uri, class_uri)
+    result = execute_sparql_query(query)
+
+    return result
+
+def get_all_property_relations_by_instance(instance_uri):
+    """ Given dbr:Colombo --> capital, city, birthPlace
+    """
+    query = """
+            select distinct ?property where {
+                ?obj ?property <%s>
+            }
+            """% (instance_uri)
+    result = execute_sparql_query(query)
+    return result
+
+def get_all_instance_properties(instance_uri):
+    """ Given dbr:Colombo --> country, area, province
+    """
+    query = """
+            select distinct ?property where {
+                <%s> ?property ?obj 
+            }
+            """% (instance_uri)
+    result = execute_sparql_query(query)
+    return result
+
+'''
+
+get all props by instance
+
+select distinct ?property where {
+    ?obj ?property dbr:Sri_Lanka
+}
+
+get all properties of a class
+
+select distinct ?property where{
+{
+  ?property rdfs:domain ?class . 
+  dbo:Country rdfs:subClassOf+ ?class.
+} UNION {
+  ?property rdfs:domain dbo:Country.
+}}
+
+get all properties of a resource
+select distinct ?property ?label ?o {
+  { dbr:Colombo ?property ?o }
+  union
+  { ?s ?property dbr:Colombo }
+
+  optional { 
+    ?property rdfs:label ?label .
+    filter langMatches(lang(?label), 'en')
+  }
+}
+
+
+select distinct ?property ?o {
+  dbr:Colombo ?property dbr:Sri_Lanka
+
+  { dbr:Colombo ?property ?o }
+  union
+  { ?s ?property dbr:Colombo }
+
+ 
+}
+
+'''

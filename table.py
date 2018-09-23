@@ -159,7 +159,6 @@ class Table(TableEntity):
 
 
 class Column(TableEntity):
-
     def __init__(self, header, cells):
         super(Column, self).__init__()
         self.header = header
