@@ -91,7 +91,11 @@ def find_cell_and_header_entities(table):
                 concept = get_exact_label_match(perm)
                 if concept is not None and len(concept) > 0:
                     # logger.info("--candidate found!")
-                    cell.predicted_labels = [[process_candidates(candidate_classes, concept), "instance", 0]]
+                    cell_candidate = process_candidates(candidate_classes, concept)
+                    if cell_candidate is None:
+                        continue
+
+                    cell.predicted_labels = [[cell_candidate, "instance", 0]]
                     break     
         
         # column.predicted_labels = candidate_classes.items()
@@ -186,12 +190,23 @@ def calcualte_probability_score(graph, cand1, cand2):
     elif cand1.type == "property" and cand2.type == "instance":
         #first check if cand1 and cand2 are related
         if graph.has_edge(cand1.id, cand2.id):
-            print 1.0
-            return 1.0
+            ambiguity = graph.degree(cand1.id)
+            return delta
+        else:
+            return delta
+    elif (cand1.type == "class" and cand2.type == "property") or \
+         (cand1.type == "property" and cand2.type == "class"):
+            if graph.has_edge(cand1.id, cand2.id):
+                return 1.0
+            else:
+                return delta
+    elif cand1.type == "property" and cand2.type == "property":
+        #first check if cand1 and cand2 are related
+        if nx.has_path(graph, cand1.id, cand2.id):
+            return delta
         else:
             return delta
 
-    
     return delta
         
 def algo(table):
@@ -269,6 +284,9 @@ def algo(table):
                 for concept in cell.predicted_labels:
                     instance = concept[0]
 
+                    if instance is None:
+                        continue
+
                     i_id = "dbr:" + instance.replace("http://dbpedia.org/resource/", "")
                     graph.add_edge(i_id, p_id)
 
@@ -317,11 +335,12 @@ def algo(table):
         "class": "blue",
         "instance": "green",
         "col_property": "red",
-        "clz_property": "yellow"
+        "clz_property": "yellow",
+        "property": "pink"
     }
     node_color = map(lambda node: mapping[entities[node].type],graph.nodes())
-    nx.draw(graph, with_labels=True, node_color=node_color)
-    plt.show()
+    # nx.draw(graph, with_labels=True, node_color=node_color)
+    # plt.show()
     
     #now we take a deep breath and start to put all this shit into the 
     #markov model
@@ -344,6 +363,9 @@ def algo(table):
             cell_card = len(cell_candidates)
             var2 = Variable(cell_name, cell_card)
 
+            if cell_card == 0:
+                continue
+            
             #for each pair of column-cell, create a factor now
             #needs to hold transition matrix of |col|x|cell|
             #usually it would be nx1
@@ -353,6 +375,7 @@ def algo(table):
             #CAREFULLY
             for i in range(column_card):
                 col_candidate = column_candidates[i][0]
+                # print i, col_candidate
 
                 if column_candidates[i][1]["type"] == "class":
                     col_id =  "dbo:" + col_candidate.replace("http://dbpedia.org/ontology/", "")
@@ -363,6 +386,7 @@ def algo(table):
 
                 for j in range(cell_card):
                     cell_candidate = cell_candidates[j][0]
+
                     cell_id = "dbr:" + cell_candidate.replace("http://dbpedia.org/resource/", "")
                     cell_entity = entities[cell_id]
 
@@ -370,12 +394,70 @@ def algo(table):
 
                     mat[i][j] = score
             
-            print mat
-
-
-
-
-
+            # print mat
+            factor_name = "%s_%s" % (column_name, cell_name)
+            factor = Factor(factor_name, mat)
+            markov_net.add(factor)
+            markov_net.append(factor_name, var1)
+            markov_net.append(factor_name, var2)
     
+    #now that shit works untill then, we add column-column factor nodes
+    for c1 in range(len(ne.columns)-1):
+        for c2 in range(c1+1, len(ne.columns)):
+            #create nodes for both columns
+            column_1 = ne.columns[c1]
+            column_1_name = "C_%d" % c1
+            column_1_candidates = data[column_1.header].items()
+            column_1_card = len(column_1_candidates)
+            var1 = Variable(column_1_name, column_1_card)
 
+            column_2 = ne.columns[c2]
+            column_2_name = "C_%d" % c2
+            column_2_candidates = data[column_2.header].items()
+            column_2_card = len(column_2_candidates)
+            var2 = Variable(column_2_name, column_2_card)
+
+            if column_2_card == 0:
+                continue 
+            
+            #for each pair of column-cell, create a factor now
+            #needs to hold transition matrix of |col1|x|col2|
+            #usually it would be nx1
+            mat = np.zeros([column_1_card, column_2_card])
+
+            #we gotta loop candidates of both now
+            for i in range(column_1_card):
+                col_1_candidate = column_1_candidates[i][0]
+                if column_1_candidates[i][1]["type"] == "class":
+                    col_1_id =  "dbo:" + col_1_candidate.replace("http://dbpedia.org/ontology/", "")
+                else:
+                    col_1_id =  "dbp:" + col_1_candidate.replace("http://dbpedia.org/ontology/", "")
+                col_1_entity = entities[col_1_id]
+
+                for j in range(column_2_card):
+                    col_2_candidate = column_2_candidates[j][0]
+                    if column_2_candidates[j][1]["type"] == "class":
+                        col_2_id =  "dbo:" + col_2_candidate.replace("http://dbpedia.org/ontology/", "")
+                    else:
+                        col_2_id =  "dbp:" + col_2_candidate.replace("http://dbpedia.org/ontology/", "")
+                    col_2_entity = entities[col_2_id]
+
+                    score = calcualte_probability_score(graph, col_1_entity, col_2_entity)
+
+                    mat[i][j] = score
+            
+            # C_1_C_2
+            factor_name = "%s_%s" % (column_1_name, column_2_name)
+            factor = Factor(factor_name, mat)
+            markov_net.add(factor)
+            markov_net.append(factor_name, var1)
+            markov_net.append(factor_name, var2)
+
+        
+    markov_net.compute_marginals()
+    marginals =  markov_net.nodes['C_0'].marginal().tolist()
+    print data[ne.columns[0].header].items()[marginals.index(max(marginals))]
+    
+    marginals =  markov_net.nodes['C_1'].marginal().tolist()
+    print data[ne.columns[1].header].items()[marginals.index(max(marginals))]
     
