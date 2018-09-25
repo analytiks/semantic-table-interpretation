@@ -9,7 +9,12 @@ if __name__ == "__main__":
     #                       "./dataset/t2d/table_column_ann",
     #                       algo)
     
-    t2d.evaluate_t2d_complete("./dataset/custom/ds",
+    # t2d.evaluate_t2d_complete("./dataset/custom/ds",
+    #                       "./dataset/t2d/table_ann.csv",
+    #                       "./dataset/t2d/table_column_ann",
+    #                       algo)
+
+    t2d.evaluate_t2d_complete("./dataset/t2d/table_all",
                           "./dataset/t2d/table_ann.csv",
-                          "./dataset/custom/ann",
+                          "./dataset/t2d/table_column_ann",
                           algo)

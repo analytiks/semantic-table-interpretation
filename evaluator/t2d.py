@@ -47,6 +47,7 @@ def calculate_fp_fp_fn(table_entity_array):
 
         true = [entity.true_label]
         predicted = [c[0] for c in entity.predicted_labels]
+        print true, "-------", predicted
         labels = set(true + predicted)
         
         for label in labels:
@@ -140,7 +141,7 @@ def evaluate_t2d_complete(data_dir, class_ann, column_ann_dir, algorithm):
             else:
                 #if no subject column found by the algorithm
                 #put empty list as the predicted labels
-                tb.predicted_labels = []
+                tb.predicted_labels = [("http://www.w3.org/2002/07/owl#Thing", 0)]
 
             TP = 0
             FP = 0
