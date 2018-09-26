@@ -47,8 +47,12 @@ def read_lines():
 				name = temp_vals[1]
 				if(uri[0]=='"'):
 					uri = uri[1:]
+				if(uri[-1]=='"'):
+					uri = uri[:-1]
 				if(uri[-2]=='"'):
 					uri = uri[:-2]
+				if(uri[-3]=='"'):
+					uri = uri[:-3]
 				print uri
 				new_line = uri + "," + name + ","
 				uri = urllib.unquote(uri).decode('utf8')
