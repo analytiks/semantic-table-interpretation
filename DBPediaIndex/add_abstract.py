@@ -32,7 +32,7 @@ def build_query(uri):
 
 def read_lines():
 
-	path_list = glob.glob('/home/lahiru/fyp/DBPediaIndex/subset/out/*.csv')
+	path_list = glob.glob('/home/lahiru/fyp/sti/DBPediaIndex/*.csv')
 	
 	for file_path in path_list:
 		new_file_name = "1-"+file_path.split("/")[-1]
@@ -61,12 +61,12 @@ def read_lines():
 					traceback.print_exc()
 				else:
 					try:
-						content = ""
+						content = '"'
 						for a in abstracts:
 								val = urllib.unquote(a['abstract']['value']).encode('utf8')
 								content = content + val
+						content = content + '"'
 						new_line = new_line + content
-
 					except Exception as e:
 						print e
 				with open(new_file_name, 'a') as f2:
