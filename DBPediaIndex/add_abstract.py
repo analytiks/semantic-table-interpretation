@@ -7,6 +7,8 @@ import csv
 
 import traceback
 
+BASE_PATH = '/home/lahiru/sti/DBPediaIndex'
+
 def execute_sparql_query(query):
 
 	#first try the cache
@@ -32,10 +34,21 @@ def build_query(uri):
 
 def read_lines():
 
-	path_list = glob.glob('/home/lahiru/sti/DBPediaIndex/subset/*.csv')
+	path_list = glob.glob(BASE_PATH + '/subset/*.csv')
+	compeleted_paths = glob.glob(BASE_PATH+'/processed/*.csv')
+	completed_files = []
+	print len(path_list)
+
+
+	for f_path in compeleted_paths:
+		curr_path = BASE_PATH+'/subset/'+f_path.split("/")[-1]
+		completed_files.append(curr_path)
+		path_list.remove(curr_path)
+
+	print len(path_list)
 	
 	for file_path in path_list:
-		new_file_name = "processed/	"+file_path.split("/")[-1]
+		new_file_name = "processed/"+file_path.split("/")[-1]
 		with open(new_file_name, 'w') as f1:
 				f1.write('uri,name,abstract\n')
 		with open(new_file_name, mode='a') as f2:
