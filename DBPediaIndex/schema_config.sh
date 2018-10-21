@@ -2,8 +2,8 @@
 
 curl -X POST -H 'Content-type:application/json' --data-binary '{
   "add-field":{
-     "name":"url",
-     "indexed":false,
+     "name":"uri",
+     "indexed":true,
      "type":"string",
      "stored":true }
 }' http://localhost:8983/solr/dbpedia/schema
