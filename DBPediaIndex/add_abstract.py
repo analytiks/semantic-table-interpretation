@@ -37,7 +37,6 @@ def read_lines():
 	path_list = glob.glob(BASE_PATH + '/subset/*.csv')
 	compeleted_paths = glob.glob(BASE_PATH+'/processed/*.csv')
 	completed_files = []
-	print len(path_list)
 
 
 	for f_path in compeleted_paths:
@@ -45,7 +44,6 @@ def read_lines():
 		completed_files.append(curr_path)
 		path_list.remove(curr_path)
 
-	print len(path_list)
 	
 	for file_path in path_list:
 		new_file_name = "processed/"+file_path.split("/")[-1]
