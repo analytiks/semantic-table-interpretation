@@ -167,6 +167,7 @@ class Column(TableEntity):
         self.date_col = None
         self.NE_col = None
         self.is_subject_column = False
+        self.candidates = set()
 
     def is_NE(self):
         if(self.NE_col is None):
@@ -233,6 +234,7 @@ class Cell(TableEntity):
     def __init__(self, value):
         super(Cell, self).__init__()
         self.value = value
+        self.candidates = set()
 
     def is_NE(self):
         if(self.is_date()):

@@ -12,11 +12,12 @@ Todo:
     3. For more than one word, find the concepts that are common to all
 '''
 
-def execute_sparql_query(query):
+def execute_sparql_query(query, cached=True):
     #first try the cache
-    result = cache.get(query)
-    if result is not None:
-        return result
+    if cached:
+        result = cache.get(query)
+        if result is not None:
+            return result
 
     #if no result in cache
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
@@ -66,7 +67,7 @@ def get_exact_label_match(value):
                 ?uri rdf:type ?type .
                 FILTER (?label="%s"@en)
             }
-            """ % value
+            """ % unicode(value, "utf-8")
     result = execute_sparql_query(query)
 
     return result
@@ -173,8 +174,10 @@ def get_all_property_relations_by_instance(instance_uri):
     """ Given dbr:Colombo --> capital, city, birthPlace
     """
     query = """
-            select distinct ?property where {
-                ?obj ?property <%s>
+            select distinct ?property STR(?label) where {
+                ?obj ?property <%s> .
+                ?property rdfs:label ?label.
+                FILTER ( LANG(?label) = "en" )
             }
             """% (instance_uri)
     result = execute_sparql_query(query)
@@ -184,10 +187,21 @@ def get_all_instance_properties(instance_uri):
     """ Given dbr:Colombo --> country, area, province
     """
     query = """
-            select distinct ?property where {
-                <%s> ?property ?obj 
+            select distinct ?property STR(?label) where {
+                <%s> ?property ?obj .
+                ?property rdfs:label ?label.
+                FILTER ( LANG(?label) = "en" )
             }
             """% (instance_uri)
+    result = execute_sparql_query(query)
+    return result
+
+def get_parents(class_uri):
+    query = """
+            SELECT DISTINCT ?c WHERE {
+                %s rdfs:subClassOf* ?c .
+            } 
+            """% (class_uri)
     result = execute_sparql_query(query)
     return result
 

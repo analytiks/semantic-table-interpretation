@@ -98,7 +98,10 @@ def evaluate_t2d_complete(data_dir, class_ann, column_ann_dir, algorithm):
     t_tab_fn = 0
     t_tab_tp = 0
     
+    current = 0
     for table_file in filenames:
+        current += 1
+        logger.info("Progress : %d/%d" % (current, len(filenames)) )
         logger.info("Annotating : %s" % table_file)
 
         
